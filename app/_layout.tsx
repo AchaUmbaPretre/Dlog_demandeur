@@ -3,6 +3,7 @@ import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
+import Toast from 'react-native-toast-message';
 import { Provider, useDispatch } from 'react-redux';
 import { setToken, setUser } from '../redux/authSlice';
 import { store } from '../redux/store';
@@ -46,7 +47,8 @@ export default function RootLayout() {
   return (
     <Provider store={store}>
       <AuthInitializer>
-        <StatusBar hidden />
+        <Toast position="top" topOffset={50} />
+        <StatusBar/>
         <Slot />
       </AuthInitializer>
     </Provider>

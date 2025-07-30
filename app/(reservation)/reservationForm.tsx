@@ -1,13 +1,14 @@
 import {
   getCatVehicule,
-  getChauffeur,
   getDestination,
   getMotif,
   getServiceDemandeur,
   getVehiculeDispo,
+  postDemandeVehicule
 } from "@/services/charroiService";
 import { getClient } from "@/services/clientService";
 import { AntDesign } from "@expo/vector-icons";
+import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -24,6 +25,7 @@ import {
   View,
 } from "react-native";
 import { Button, Card, TextInput, Title } from "react-native-paper";
+import Toast from 'react-native-toast-message';
 import { useSelector } from "react-redux";
 
 interface Vehicule {
@@ -57,13 +59,19 @@ interface TypeVehicule {
 
 interface FormState {
   id_vehicule: number | null;
-  id_motif: number | null;
+  id_motif_demande: number | null;
   id_demandeur: number | null;
   id_client: number | null;
   id_destination: number | null;
   personne_bord: string;
   id_type_vehicule: number | null;
 }
+
+type PickerState = {
+  label: string;
+  value: Date | null;
+  onChange: (date: Date) => void;
+} | null;
 
 const ReservationForm: React.FC = () => {
   const [loadingData, setLoadingData] = useState(false);
@@ -74,11 +82,16 @@ const ReservationForm: React.FC = () => {
   const [serviceList, setServiceList] = useState<Service[]>([]);
   const [destinationList, setDestinationList] = useState<Destination[]>([]);
   const [clientList, setClientList] = useState<Client[]>([]);
+  const [dateChargement, setDateChargement] = useState<Date | null>(null);
+  const [datePrevue, setDatePrevue] = useState<Date | null>(null);
+  const [dateRetour, setDateRetour] = useState<Date | null>(null);
+  const [showPicker, setShowPicker] = useState<PickerState>(null);
+
   const router = useRouter();
 
   const [form, setForm] = useState<FormState>({
     id_vehicule: null,
-    id_motif: null,
+    id_motif_demande: null,
     id_demandeur: null,
     id_client: null,
     id_destination: null,
@@ -99,7 +112,6 @@ const ReservationForm: React.FC = () => {
       ] = await Promise.all([
         getVehiculeDispo(),
         getCatVehicule(),
-        getChauffeur(),
         getServiceDemandeur(),
         getMotif(),
         getDestination(),
@@ -127,35 +139,72 @@ const ReservationForm: React.FC = () => {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async () => {
-    if (!form.id_vehicule || !form.id_motif || !form.id_demandeur ) {
-      Alert.alert("Champs requis", "Veuillez remplir tous les champs obligatoires (*)");
-      return;
-    }
+const handleSubmit = () => {
+  if (!form.id_motif_demande || !form.id_demandeur) {
+    Alert.alert("Champs requis", "Veuillez remplir tous les champs obligatoires (*)");
+    return;
+  }
 
-    try {
-      setLoadingData(true);
-/*       await postSortieVehiculeExceptionnel({
-        ...form,
-        id_agent: userId
-      }); */
-      Alert.alert("Succès", "Sortie enregistré avec succès !");
-      setForm({
-        id_vehicule: null,
-        id_motif: null,
-        id_demandeur: null,
-        id_client: null,
-        id_destination: null,
-        personne_bord: "",
-        id_type_vehicule: null
-      });
-      fetchDatas();
-    } catch (error) {
-      Alert.alert("Erreur", "Impossible d'enregistrer le retour.");
-    } finally {
-      setLoadingData(false);
-    }
-  };
+  Alert.alert(
+    "Confirmation",
+    "Voulez-vous vraiment envoyer cette demande ?",
+    [
+      {
+        text: "Annuler",
+        style: "cancel"
+      },
+      {
+        text: "Confirmer",
+        onPress: async () => {
+          try {
+            setLoadingData(true);
+            await postDemandeVehicule({
+              ...form,
+              date_chargement: dateChargement,
+              date_prevue: datePrevue,
+              date_retour: dateRetour,
+              user_cr: userId
+            });
+
+            Toast.show({
+              type: 'success',
+              text1: 'Succès',
+              text2: 'La demande a été envoyée avec succès 🎉',
+              position: 'top'
+            });
+
+            setForm({
+              id_vehicule: null,
+              id_motif_demande: null,
+              id_demandeur: null,
+              id_client: null,
+              id_destination: null,
+              personne_bord: "",
+              id_type_vehicule: null
+            });
+
+            setDateChargement(null);
+            setDatePrevue(null);
+            setDateRetour(null);
+            router.push('/(tabs)/home');
+            fetchDatas();
+
+          } catch (error) {
+            Toast.show({
+              type: 'error',
+              text1: 'Erreur',
+              text2: "Échec lors de l'enregistrement.",
+              position: 'top'
+            });
+          } finally {
+            setLoadingData(false);
+          }
+        }
+      }
+    ]
+  );
+};
+
 
   const renderPicker = (label: string, key: keyof FormState, data: any[], labelProp: string, valueProp: string) => (
     <View style={styles.field}>
@@ -178,6 +227,65 @@ const ReservationForm: React.FC = () => {
     </View>
   );
 
+const openPicker = (
+  label: string,
+  value: Date | null,
+  onChange: (date: Date) => void
+) => {
+  const initialDate = value || new Date();
+
+  if (Platform.OS === 'android') {
+    // D'abord on ouvre le date picker
+    DateTimePickerAndroid.open({
+      value: initialDate,
+      mode: 'date',
+      is24Hour: true,
+      display: 'default',
+      onChange: (_event, selectedDate) => {
+        if (selectedDate) {
+          // Ensuite, on ouvre le time picker
+          DateTimePickerAndroid.open({
+            value: selectedDate,
+            mode: 'time',
+            is24Hour: true,
+            display: 'default',
+            onChange: (_evt, selectedTime) => {
+              if (selectedTime) {
+                const finalDate = new Date(selectedDate);
+                finalDate.setHours(selectedTime.getHours());
+                finalDate.setMinutes(selectedTime.getMinutes());
+                onChange(finalDate);
+              }
+            },
+          });
+        }
+      },
+    });
+  } else {
+    setShowPicker({ label, value, onChange });
+  }
+};
+
+const renderDateTimePicker = (
+    label: string,
+    value: Date | null,
+    onChange: (date: Date) => void
+  ) => (
+    <View style={styles.field}>
+      <Text style={styles.label}>{label}</Text>
+      <Button
+        mode="outlined"
+        onPress={() => openPicker(label, value, onChange)}
+        style={{ borderRadius: 0, borderColor: '#ccc' }}
+      >
+        <Text style={{ color: '#555' }}>
+          {value ? value.toLocaleString() : 'Choisir la date et l\'heure'}
+        </Text>
+      </Button>
+    </View>
+  );
+
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -197,8 +305,13 @@ const ReservationForm: React.FC = () => {
           ) : (
             <Card style={styles.card}>
               <Card.Content>
-                {renderPicker("Type vehicule *", "id_type_vehicule", catList, "nom_cat", "id_cat_vehicule")}
-                {renderPicker("Motif *", "id_motif", motifList, "nom_motif_demande", "id_motif_demande")}
+
+                {renderDateTimePicker("Date & heure de chargement", dateChargement, setDateChargement)}
+                {renderDateTimePicker("Date & heure de départ prévue", datePrevue, setDatePrevue)}
+                {renderDateTimePicker("Date & heure de retour prévue", dateRetour, setDateRetour)}
+
+                {renderPicker("Type véhicule *", "id_type_vehicule", catList, "nom_cat", "id_cat_vehicule")}
+                {renderPicker("Motif *", "id_motif_demande", motifList, "nom_motif_demande", "id_motif_demande")}
                 {renderPicker("Service Demandeur *", "id_demandeur", serviceList, "nom_service", "id_service_demandeur")}
                 {renderPicker("Client", "id_client", clientList, "nom", "id_client")}
                 {renderPicker("Destination", "id_destination", destinationList, "nom_destination", "id_destination")}
@@ -226,6 +339,20 @@ const ReservationForm: React.FC = () => {
           )}
         </View>
       </ScrollView>
+      {showPicker && (
+          <DateTimePicker
+            value={showPicker.value || new Date()}
+            mode="datetime"
+            {...(Platform.OS === "android" ? { is24Hour: true } : {})}
+            onChange={(event, selectedDate) => {
+              if (event.type === "set" && selectedDate) {
+                showPicker.onChange(selectedDate);
+              }
+              setShowPicker(null);
+            }}
+            display="default"
+          />
+        )}
     </SafeAreaView>
   );
 };

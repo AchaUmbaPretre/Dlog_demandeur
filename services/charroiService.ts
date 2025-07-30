@@ -45,3 +45,15 @@ export const postValidationDemande = async (
     throw error;
   }
 };
+
+
+export const postDemandeVehicule = async (
+  data: Record<string, any>
+): Promise<AxiosResponse<any>> => {
+  try {
+    return await axios.post(`${BASE_URL}/demande_vehicule`, data);
+  } catch (error) {
+    console.error("Erreur lors de l'envoi de demande :", error);
+    throw error;
+  }
+};
