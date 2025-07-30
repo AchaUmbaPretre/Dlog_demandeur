@@ -1,13 +1,20 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import LottieView from 'lottie-react-native';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import {
+  Dimensions,
+  StyleSheet,
+  useColorScheme
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { Provider, useDispatch } from 'react-redux';
 import { setToken, setUser } from '../redux/authSlice';
 import { store } from '../redux/store';
+
+const { height } = Dimensions.get('window');
 
 function AuthInitializer({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
@@ -39,7 +46,12 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007bff" />
+        <LottieView
+          source={require('../assets/images/Logo-Gtm.png')}
+          autoPlay
+          loop
+          style={{ width: 200, height: 200 }}
+        />
       </SafeAreaView>
     );
   }
@@ -48,15 +60,15 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
 }
 
 export default function RootLayout() {
+  const colorScheme = useColorScheme();
+
   return (
     <Provider store={store}>
       <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="auto" />
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
           <AuthInitializer>
             <Slot />
           </AuthInitializer>
-        </ScrollView>
         <Toast position="top" topOffset={55} />
       </SafeAreaView>
     </Provider>
@@ -70,11 +82,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: 20,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
+    height,
   },
 });

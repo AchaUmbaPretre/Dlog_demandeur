@@ -4,14 +4,13 @@ import { useRouter } from 'expo-router';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   FlatList,
   Pressable,
   SafeAreaView,
   StyleSheet,
   Text,
-  View,
+  View
 } from 'react-native';
 import { Card } from 'react-native-paper';
 import { useSelector } from 'react-redux';
@@ -21,6 +20,8 @@ const ReservationList = () => {
   const [data, setData] = useState<any[]>([]);
   const userId = useSelector((state: any) => state.auth?.currentUser?.id_utilisateur);
   const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
+
 
   const fetchDatas = async () => {
     try {
@@ -36,9 +37,24 @@ const ReservationList = () => {
     }
   };
 
-  useEffect(() => {
-    if (userId) fetchDatas();
-  }, [userId]);
+useEffect(() => {
+  if (userId) {
+    fetchDatas(); // Chargement initial
+
+    const interval = setInterval(() => {
+      fetchDatas();
+    }, 10000); 
+
+    return () => clearInterval(interval);
+  }
+}, [userId]);
+
+
+  const onRefresh = async () => {
+  setRefreshing(true);
+  await fetchDatas();
+  setRefreshing(false);
+};
 
   const getStatusStyle = (statut: string) => {
     switch (statut) {
@@ -81,21 +97,17 @@ const ReservationList = () => {
         <Text style={styles.headerTitle}>Liste des réservations</Text>
       </View>
 
-      {loadingData ? (
-        <View style={styles.loader}>
-          <ActivityIndicator size="large" color="#007AFF" />
-        </View>
-      ) : (
         <FlatList
-          data={data}
-          keyExtractor={(item) => item.id_demande_vehicule.toString()}
-          renderItem={renderItem}
-          contentContainerStyle={styles.listContent}
-          ListEmptyComponent={
-            <Text style={styles.emptyText}>Aucune réservation trouvée.</Text>
-          }
-        />
-      )}
+        data={data}
+        keyExtractor={(item) => item.id_demande_vehicule.toString()}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>Aucune réservation trouvée.</Text>
+        }
+      />
     </SafeAreaView>
   );
 };
