@@ -17,7 +17,6 @@ import {
   Platform,
   Pressable,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   View
@@ -353,16 +352,14 @@ const styles = StyleSheet.create({
   paddingLeft: 4,
   alignSelf: "flex-start",
 },
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-  },
   scrollContainer: {
     flex: 1,
+    backgroundColor: "#fff",
+
   },
   scroll: {
-    paddingBottom: 24,
+    paddingBottom: 10,
+    backgroundColor: "#fff",
   },
   inner: {
     paddingHorizontal: 16,
@@ -399,7 +396,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: "#fff",
     elevation: 2,
-    marginBottom: 50
   },
   button: {
     marginTop: 16,

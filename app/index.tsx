@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Button, Text, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
+import LoginScreen from './(auth)/login';
 
 export default function Index() {
   const router = useRouter();
@@ -37,8 +38,7 @@ export default function Index() {
 
   return (
     <View >
-      <Text >Accueil (non connecté)</Text>
-      <Button title="Aller à Login" onPress={() => router.push('/login')} />
+      <LoginScreen/>
     </View>
   );
 }

@@ -8,8 +8,6 @@ import React, { useState } from 'react';
 import {
   Alert,
   Image,
-  Platform,
-  StatusBar,
   StyleSheet,
   TouchableOpacity,
   View
@@ -101,8 +99,8 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: '#f9f9f9',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
     paddingHorizontal: 20,
+    paddingTop:20
 
   },
   header: {
