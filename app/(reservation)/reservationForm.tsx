@@ -1,4 +1,5 @@
 import {
+  getCatVehicule,
   getChauffeur,
   getDestination,
   getMotif,
@@ -31,11 +32,7 @@ interface Vehicule {
   nom_marque: string;
   modele: string;
 }
-interface Chauffeur {
-  id_chauffeur: number;
-  nom: string;
-  postnom: string;
-}
+
 interface Motif {
   id_motif_demande: number;
   nom_motif_demande: string;
@@ -55,7 +52,6 @@ interface Client {
 
 interface FormState {
   id_vehicule: number | null;
-  id_chauffeur: number | null;
   id_motif: number | null;
   id_demandeur: number | null;
   id_client: number | null;
@@ -67,7 +63,7 @@ const ReservationForm: React.FC = () => {
   const [loadingData, setLoadingData] = useState(false);
   const userId = useSelector((state: any) => state.auth?.currentUser?.id_utilisateur);
   const [vehiculeList, setVehiculeList] = useState<Vehicule[]>([]);
-  const [chauffeurList, setChauffeurList] = useState<Chauffeur[]>([]);
+  const [catList, setCatList] = useState<Vehicule[]>([]);
   const [motifList, setMotifList] = useState<Motif[]>([]);
   const [serviceList, setServiceList] = useState<Service[]>([]);
   const [destinationList, setDestinationList] = useState<Destination[]>([]);
@@ -76,7 +72,6 @@ const ReservationForm: React.FC = () => {
 
   const [form, setForm] = useState<FormState>({
     id_vehicule: null,
-    id_chauffeur: null,
     id_motif: null,
     id_demandeur: null,
     id_client: null,
@@ -89,13 +84,14 @@ const ReservationForm: React.FC = () => {
       setLoadingData(true);
       const [
         vehiculeData,
-        chauffeurData,
+        catData,
         serviceData,
         motifData,
         destinationData,
         clientData,
       ] = await Promise.all([
         getVehiculeDispo(),
+        getCatVehicule(),
         getChauffeur(),
         getServiceDemandeur(),
         getMotif(),
@@ -103,11 +99,11 @@ const ReservationForm: React.FC = () => {
         getClient(),
       ]);
       setVehiculeList(vehiculeData.data);
-      setChauffeurList(chauffeurData.data?.data ?? []);
       setServiceList(serviceData.data);
       setMotifList(motifData.data);
       setDestinationList(destinationData.data);
       setClientList(clientData.data);
+      setCatList(catData.data)
     } catch (err) {
       Alert.alert("Erreur", "Échec de chargement des données.");
     } finally {
@@ -125,7 +121,7 @@ const ReservationForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (!form.id_vehicule || !form.id_chauffeur || !form.id_motif || !form.id_demandeur ) {
+    if (!form.id_vehicule || !form.id_motif || !form.id_demandeur ) {
       Alert.alert("Champs requis", "Veuillez remplir tous les champs obligatoires (*)");
       return;
     }
@@ -139,7 +135,6 @@ const ReservationForm: React.FC = () => {
       Alert.alert("Succès", "Sortie enregistré avec succès !");
       setForm({
         id_vehicule: null,
-        id_chauffeur: null,
         id_motif: null,
         id_demandeur: null,
         id_client: null,
@@ -195,7 +190,6 @@ const ReservationForm: React.FC = () => {
             <Card style={styles.card}>
               <Card.Content>
                 {renderPicker("Véhicule *", "id_vehicule", vehiculeList, "immatriculation", "id_vehicule")}
-                {renderPicker("Chauffeur *", "id_chauffeur", chauffeurList, "nom", "id_chauffeur")}
                 {renderPicker("Motif *", "id_motif", motifList, "nom_motif_demande", "id_motif_demande")}
                 {renderPicker("Service Demandeur *", "id_demandeur", serviceList, "nom_service", "id_service_demandeur")}
                 {renderPicker("Client", "id_client", clientList, "nom", "id_client")}
