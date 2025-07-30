@@ -3,7 +3,6 @@ import {
   getDestination,
   getMotif,
   getServiceDemandeur,
-  getVehiculeDispo,
   postDemandeVehicule
 } from "@/services/charroiService";
 import { getClient } from "@/services/clientService";
@@ -28,12 +27,6 @@ import { Button, Card, TextInput, Title } from "react-native-paper";
 import Toast from 'react-native-toast-message';
 import { useSelector } from "react-redux";
 
-interface Vehicule {
-  id_vehicule: number;
-  immatriculation: string;
-  nom_marque: string;
-  modele: string;
-}
 
 interface Motif {
   id_motif_demande: number;
@@ -76,7 +69,6 @@ type PickerState = {
 const Plus: React.FC = () => {
   const [loadingData, setLoadingData] = useState(false);
   const userId = useSelector((state: any) => state.auth?.currentUser?.id_utilisateur);
-  const [vehiculeList, setVehiculeList] = useState<Vehicule[]>([]);
   const [catList, setCatList] = useState<TypeVehicule[]>([]);
   const [motifList, setMotifList] = useState<Motif[]>([]);
   const [serviceList, setServiceList] = useState<Service[]>([]);
@@ -103,21 +95,18 @@ const Plus: React.FC = () => {
     try {
       setLoadingData(true);
       const [
-        vehiculeData,
         catData,
         serviceData,
         motifData,
         destinationData,
         clientData,
       ] = await Promise.all([
-        getVehiculeDispo(),
         getCatVehicule(),
         getServiceDemandeur(),
         getMotif(),
         getDestination(),
         getClient(),
       ]);
-      setVehiculeList(vehiculeData.data);
       setServiceList(serviceData.data);
       setMotifList(motifData.data);
       setDestinationList(destinationData.data);
