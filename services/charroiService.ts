@@ -34,6 +34,17 @@ export const getBandeSortieUnique = async (id: number): Promise<AxiosResponse<an
   }
 };
 
+export const getDemandeVehiculeUserOne = async (id: number): Promise<AxiosResponse<any>> => {
+  try {
+    return await axios.get(`${BASE_URL}/demande_vehiculeUserOne`, {
+      params: { userId: id },
+    });
+  } catch (error) {
+    console.error("Erreur lors de la récupération des demandes :", error);
+    throw error;
+  }
+};
+
 
 export const postValidationDemande = async (
   data: Record<string, any>

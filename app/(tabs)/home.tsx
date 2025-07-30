@@ -9,8 +9,6 @@ import {
   Alert,
   Image,
   Platform,
-  SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   TouchableOpacity,
@@ -58,8 +56,7 @@ const Home = () => {
     };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container}>
+      <View style={styles.safeArea}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.profileContainer}>
@@ -94,9 +91,7 @@ const Home = () => {
             <Item icon={Images.listeReservation} label="Voir tes réservations" onPress={()=> router.push('/reservationList')}/>
         </View>
 
-      </ScrollView>
-    </SafeAreaView>
-    
+      </View>    
   );
 };
 
@@ -107,9 +102,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9f9f9',
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
-  container: {
     paddingHorizontal: 20,
+
   },
   header: {
     flexDirection: 'row',

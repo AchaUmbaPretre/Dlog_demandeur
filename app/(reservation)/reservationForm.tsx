@@ -16,12 +16,11 @@ import {
   Alert,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 import { Button, Card, TextInput, Title } from "react-native-paper";
 import Toast from 'react-native-toast-message';
@@ -275,7 +274,7 @@ const renderDateTimePicker = (
 
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+      <>
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.scroll}
@@ -341,7 +340,7 @@ const renderDateTimePicker = (
             display="default"
           />
         )}
-    </SafeAreaView>
+    </>
   );
 };
 
