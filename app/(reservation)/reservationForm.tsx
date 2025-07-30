@@ -50,6 +50,11 @@ interface Client {
   nom: string;
 }
 
+interface TypeVehicule {
+  id_cat_vehicule : number,
+  nom_cat: string;
+}
+
 interface FormState {
   id_vehicule: number | null;
   id_motif: number | null;
@@ -57,13 +62,14 @@ interface FormState {
   id_client: number | null;
   id_destination: number | null;
   personne_bord: string;
+  id_type_vehicule: number | null;
 }
 
 const ReservationForm: React.FC = () => {
   const [loadingData, setLoadingData] = useState(false);
   const userId = useSelector((state: any) => state.auth?.currentUser?.id_utilisateur);
   const [vehiculeList, setVehiculeList] = useState<Vehicule[]>([]);
-  const [catList, setCatList] = useState<Vehicule[]>([]);
+  const [catList, setCatList] = useState<TypeVehicule[]>([]);
   const [motifList, setMotifList] = useState<Motif[]>([]);
   const [serviceList, setServiceList] = useState<Service[]>([]);
   const [destinationList, setDestinationList] = useState<Destination[]>([]);
@@ -77,6 +83,7 @@ const ReservationForm: React.FC = () => {
     id_client: null,
     id_destination: null,
     personne_bord: "",
+    id_type_vehicule : null
   });
 
   const fetchDatas = async () => {
@@ -139,7 +146,8 @@ const ReservationForm: React.FC = () => {
         id_demandeur: null,
         id_client: null,
         id_destination: null,
-        personne_bord: ""
+        personne_bord: "",
+        id_type_vehicule: null
       });
       fetchDatas();
     } catch (error) {
@@ -189,7 +197,7 @@ const ReservationForm: React.FC = () => {
           ) : (
             <Card style={styles.card}>
               <Card.Content>
-                {renderPicker("Véhicule *", "id_vehicule", vehiculeList, "immatriculation", "id_vehicule")}
+                {renderPicker("Type vehicule *", "id_type_vehicule", catList, "nom_cat", "id_cat_vehicule")}
                 {renderPicker("Motif *", "id_motif", motifList, "nom_motif_demande", "id_motif_demande")}
                 {renderPicker("Service Demandeur *", "id_demandeur", serviceList, "nom_service", "id_service_demandeur")}
                 {renderPicker("Client", "id_client", clientList, "nom", "id_client")}
