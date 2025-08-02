@@ -47,7 +47,7 @@ function AuthInitializer({ children }: { children: React.ReactNode }) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <LottieView
-          source={require('../assets/images/Logo-Gtm.png')}
+          source={require('../assets/images/logo-gtm.png')}
           autoPlay
           loop
           style={{ width: 200, height: 200 }}

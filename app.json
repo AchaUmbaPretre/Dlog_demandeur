@@ -4,7 +4,7 @@
     "slug": "gtm-demandeur",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/Logo-Gtm.png",
+    "icon": "./assets/images/logo-gtm.png",
     "scheme": "gtmdemandeur",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/Logo-Gtm.png",
+        "foregroundImage": "./assets/images/logo-gtm.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
@@ -22,14 +22,14 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/Logo-Gtm.png"
+      "favicon": "./assets/images/logo-gtm.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/Logo-Gtm.png",
+          "image": "./assets/images/logo-gtm.png",
           "imageWidth": 200,
           "resizeMode": "cover",
           "backgroundColor": "#ffffff"

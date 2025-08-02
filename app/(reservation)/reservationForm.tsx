@@ -284,7 +284,7 @@ const renderDateTimePicker = (
         </Pressable>
 
         <View style={styles.inner}>
-          <Title style={styles.title}>Formulaire de reservations</Title>
+          <Title style={styles.title}>Formulaire de réservation</Title>
 
           {loadingData ? (
             <ActivityIndicator size="large" color="#007AFF" />
